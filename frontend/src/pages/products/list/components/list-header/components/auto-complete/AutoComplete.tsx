@@ -1,10 +1,13 @@
 import { useState, FC } from "react";
-import TextField from "@mui/material/TextField";
-import CircularProgress from "@mui/material/CircularProgress";
-import Autocomplete, { AutocompleteProps } from "@mui/material/Autocomplete";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
-import { API_URL } from "consts";
+import { API } from "configs";
+import {
+  TextField,
+  CircularProgress,
+  Autocomplete,
+  AutocompleteProps,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 
 type AutoCompleteProps = Pick<
   AutocompleteProps<string, false, true, false>,
@@ -57,18 +60,12 @@ const AutoComplete: FC<AutoCompleteProps> = ({ value, onChange }) => {
             }));
 
             try {
-              const response = await fetch(`${API_URL}/products/category-list`);
-
-              if (!response.ok) {
-                throw new Error();
-              }
-
-              const options = await response.json();
+              const { data } = await API.get(`/category-list`);
 
               setState((prevState) => ({
                 ...prevState,
                 loading: false,
-                options,
+                options: data,
               }));
             } catch (e) {
               setState((prevState) => ({

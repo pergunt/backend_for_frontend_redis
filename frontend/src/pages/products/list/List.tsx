@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback } from "react";
-import Box from "@mui/material/Box";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import InfiniteScroll from "react-infinite-scroll-component";
-import CircularProgress from "@mui/material/CircularProgress";
-import { API_URL } from "consts";
-import { routes } from "configs";
-import { NavLink, Image } from "components";
+import {
+  Box,
+  ListItemButton,
+  ListItemText,
+  ListItemAvatar,
+} from "@mui/material";
+import { routes, API } from "configs";
+import { NavLink, Image, InfiniteScroll, PreLoader } from "components";
 import qs from "query-string";
 import { ListHeader } from "./components";
 import { useQueryParams } from "hooks";
@@ -15,7 +14,6 @@ import { debounce } from "utils";
 import { ProductListItem } from "./types";
 
 const LIMIT = 25;
-const baseURL = `${API_URL}/products`;
 
 function App() {
   const [state, setState] = useState<{
@@ -30,21 +28,19 @@ function App() {
   const [params] = useQueryParams();
 
   const loadData = (url: string) => {
-    fetch(url)
-      .then((res) => res.json())
-      .then((result) => {
-        setState({
-          loading: false,
-          hasMore: result.total !== result.products.length,
-          items: result.products,
-        });
+    API.get(url).then(({ data }) => {
+      setState({
+        loading: false,
+        hasMore: data.total !== data.products.length,
+        items: data.products,
       });
+    });
   };
 
   // eslint-disable-next-line
-  const cb = useCallback(
+  const debouncedFetch = useCallback(
     debounce((search: string) => {
-      loadData(`${baseURL}${search ? `?${search}` : ""}`);
+      loadData(`${search ? `?${search}` : ""}`);
     }, 500),
     []
   );
@@ -53,11 +49,11 @@ function App() {
     const search = qs.stringify(params);
 
     if (params.category) {
-      loadData(`${baseURL}/category/${params.category}`);
+      loadData(`/category/${params.category}`);
     } else {
-      cb(search);
+      debouncedFetch(search);
     }
-  }, [params, cb]);
+  }, [params, debouncedFetch]);
 
   return (
     <Box>
@@ -67,9 +63,9 @@ function App() {
           scrollableTarget="scrollableDiv"
           dataLength={state.items.length + Number(state.hasMore)}
           hasMore={state.hasMore}
-          loader={<CircularProgress color="info" size={40} />}
+          loader={<PreLoader />}
           next={() => {
-            loadData(`${baseURL}/?limit=${state.items.length + LIMIT}`);
+            loadData(`?limit=${state.items.length + LIMIT}`);
           }}
         >
           {state.items.map((item) => {

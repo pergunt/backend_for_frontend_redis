@@ -1,6 +1,10 @@
 import { API_URL } from "consts";
 import { ParsedQs } from "qs";
-import fetch from "node-fetch";
+import axios from "axios";
+
+const API = axios.create({
+  baseURL: API_URL,
+});
 
 // TODO read about skip prop
 export const getList = async (query: ParsedQs) => {
@@ -8,19 +12,27 @@ export const getList = async (query: ParsedQs) => {
     ? `/search?q=${query.search}`
     : `?limit=${query.limit || 25}`;
 
-  return fetch(`${API_URL}${url}&select=id,title,price,category,images`).then(
-    (res) => res.json()
+  const { data } = await API.get(
+    `${url}&select=id,title,price,category,images`
   );
+
+  return data;
 };
 
 export const getByID = async (id: number) => {
-  return fetch(`${API_URL}/${id}`).then((res) => res.json());
+  const { data } = await API.get(`/${id}`);
+
+  return data;
 };
 
 export const getCategoryList = async () => {
-  return fetch(`${API_URL}/category-list`).then((res) => res.json());
+  const { data } = await API.get("/category-list");
+
+  return data;
 };
 
-export const getByCategory = (category: string) => {
-  return fetch(`${API_URL}/category/${category}`).then((res) => res.json());
+export const getByCategory = async (category: string) => {
+  const { data } = await API.get(`/category/${category}`);
+
+  return data;
 };
