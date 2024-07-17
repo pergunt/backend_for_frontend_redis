@@ -1,8 +1,13 @@
 import { ApiError } from "exceptions";
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
 
-// just in case: (err: Error, req: Request, res: Response, next: NextFunction)
-export default (err: Error, req: Request, res: Response) => {
+// eslint-disable-next-line
+export default (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (err instanceof ApiError) {
     return res.status(err.status).json({
       message: err.message,

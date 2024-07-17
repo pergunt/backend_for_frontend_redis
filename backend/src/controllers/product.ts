@@ -1,30 +1,32 @@
 import { productService } from "services";
 import { NextFunction, Request, Response } from "express";
 
-type Fn<Params = void> = (
-  req: Request<Params>,
-  res: Response,
-  next: NextFunction
-) => Promise<any>;
+type Fn<Params = void> = (req: Request<Params>, res: Response) => Promise<any>;
 
 const wrapper =
   <Params = void>(fn: Fn<Params>) =>
   async (req: Request<Params>, res: Response, next: NextFunction) => {
     try {
-      return await fn(req, res, next);
+      await fn(req, res);
     } catch (e) {
       next(e);
     }
   };
 
 export const getList = wrapper(async (req, res) => {
-  const users = await productService.getList();
+  const products = await productService.getList();
 
-  return res.json(users);
+  res.json(products);
 });
 
 export const getOne = wrapper<{ id: number }>(async (req, res) => {
-  const user = await productService.getByID(req.params.id);
+  const product = await productService.getByID(req.params.id);
 
-  return res.json(user);
+  res.json(product);
+});
+
+export const getCategoryList = wrapper(async (req, res) => {
+  const categoryList = await productService.getCategoryList();
+
+  res.json(categoryList);
 });
