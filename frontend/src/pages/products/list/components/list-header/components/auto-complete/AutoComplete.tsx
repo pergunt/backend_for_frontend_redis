@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { useState, FC } from "react";
 import TextField from "@mui/material/TextField";
 import CircularProgress from "@mui/material/CircularProgress";
 import Autocomplete, { AutocompleteProps } from "@mui/material/Autocomplete";
@@ -32,6 +32,7 @@ const AutoComplete: FC<AutoCompleteProps> = ({ value, onChange }) => {
           if (reason === "clickaway") {
             return;
           }
+
           setState((prevState) => ({
             ...prevState,
             error: false,
@@ -43,6 +44,8 @@ const AutoComplete: FC<AutoCompleteProps> = ({ value, onChange }) => {
       <Autocomplete<string, false, true, false>
         id="asynchronous-demo"
         sx={{ flexBasis: 200 }}
+        options={state.options}
+        loading={state.loading}
         value={value}
         onChange={onChange}
         onOpen={async () => {
@@ -76,22 +79,19 @@ const AutoComplete: FC<AutoCompleteProps> = ({ value, onChange }) => {
             }
           }
         }}
-        getOptionLabel={(option) => option}
-        options={state.options}
-        loading={state.loading}
-        renderInput={(params) => (
+        renderInput={(props) => (
           <TextField
-            {...params}
+            {...props}
             label="Category"
             variant="standard"
             InputProps={{
-              ...params.InputProps,
+              ...props.InputProps,
               endAdornment: (
                 <>
                   {state.loading ? (
                     <CircularProgress color="inherit" size={10} />
                   ) : null}
-                  {params.InputProps.endAdornment}
+                  {props.InputProps.endAdornment}
                 </>
               ),
             }}

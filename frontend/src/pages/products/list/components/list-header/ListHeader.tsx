@@ -1,12 +1,10 @@
-import { useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { AutoComplete } from "./components";
+import { useQueryParams } from "hooks";
 
 function App() {
-  const [autoCompleteValue, setAutoCompleteValue] = useState<
-    string | undefined
-  >();
+  const [params, setQueryParams] = useQueryParams();
 
   return (
     <Box
@@ -19,13 +17,21 @@ function App() {
         id="standard-basic"
         label="Search"
         variant="standard"
-        sx={{
-          flexGrow: 2,
+        sx={{ flexGrow: 2 }}
+        value={params.search || ""}
+        onChange={(event) => {
+          setQueryParams({
+            search: event.currentTarget.value,
+          });
         }}
       />
       <AutoComplete
-        value={autoCompleteValue}
-        onChange={(event, value) => setAutoCompleteValue(value)}
+        value={params.category || ""}
+        onChange={(event, value) => {
+          setQueryParams({
+            category: value,
+          });
+        }}
       />
     </Box>
   );
