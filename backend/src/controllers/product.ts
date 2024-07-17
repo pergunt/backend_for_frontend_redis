@@ -14,7 +14,7 @@ const wrapper =
   };
 
 export const getList = wrapper(async (req, res) => {
-  const products = await productService.getList();
+  const products = await productService.getList(Number(req.query.limit || 20));
 
   res.json(products);
 });

@@ -1,5 +1,6 @@
 import ReactDOM from "react-dom/client";
 import "./index.css";
+import { BrowserRouter } from "components";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import ScopedCssBaseline from "@mui/material/ScopedCssBaseline";
@@ -9,7 +10,9 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <ScopedCssBaseline>
-    <App />
+    <BrowserRouter>
+      <App />
+    </BrowserRouter>
   </ScopedCssBaseline>
 );
 

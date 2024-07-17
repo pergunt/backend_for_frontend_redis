@@ -1,6 +1,7 @@
 import "dotenv/config";
 
 import express from "express";
+import { queryParser } from "express-query-parser";
 import cors from "cors";
 import router from "router";
 import { checkEnvVars } from "utils";
@@ -17,7 +18,14 @@ if (!envVars) {
 const { PORT, CORS_URLS } = envVars;
 
 app.use(express.json());
-
+app.use(
+  queryParser({
+    parseNull: true,
+    parseUndefined: true,
+    parseBoolean: true,
+    parseNumber: true,
+  })
+);
 app.use(
   cors({
     credentials: true,

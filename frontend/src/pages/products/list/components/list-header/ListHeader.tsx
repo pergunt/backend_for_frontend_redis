@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import { AutoComplete } from "components";
+import { AutoComplete } from "./components";
 
 function App() {
   const [autoCompleteValue, setAutoCompleteValue] = useState<

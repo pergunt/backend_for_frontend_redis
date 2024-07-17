@@ -1,8 +1,10 @@
 import { API_URL } from "consts";
 import fetch from "node-fetch";
 
-export const getList = async () => {
-  return fetch(API_URL).then((res) => res.json());
+export const getList = async (limit = 20) => {
+  return fetch(
+    `${API_URL}?limit=${limit}&select=id,title,price,category,images`
+  ).then((res) => res.json());
 };
 
 export const getByID = async (id: number) => {
