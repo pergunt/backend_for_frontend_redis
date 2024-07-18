@@ -6,21 +6,22 @@ const API = axios.create({
   baseURL: API_URL,
 });
 
-// TODO read about skip prop
+const selectedKeys = "id,title,price,category,images";
+
 export const getList = async (query: ParsedQs) => {
   const url = query.search
     ? `/search?q=${query.search}`
     : `?limit=${query.limit || 25}`;
 
-  const { data } = await API.get(
-    `${url}&select=id,title,price,category,images`
-  );
+  const { data } = await API.get(`${url}&select=${selectedKeys}`);
 
   return data;
 };
 
 export const getByID = async (id: number) => {
-  const { data } = await API.get(`/${id}`);
+  const { data } = await API.get(
+    `/${id}?select=${selectedKeys},description,brand`
+  );
 
   return data;
 };

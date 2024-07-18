@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "hooks";
 import {
   Box,
@@ -15,7 +15,7 @@ import { styled } from "@mui/material/styles";
 import { Image, NavLink, PreLoader } from "components";
 import MoodBadIcon from "@mui/icons-material/MoodBad";
 import { API, routes } from "configs";
-import { Product } from "./types";
+import { ProductDetails } from "../types";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#fff",
@@ -25,17 +25,16 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-const Details: FC = () => {
+const Details = () => {
   const { id } = useParams<"id">();
   const [state, setState] = useState<{
     loading: boolean;
-    record: Product | null;
+    record: ProductDetails | null;
   }>({
     loading: true,
     record: null,
   });
 
-  // TODO handle errors
   useEffect(() => {
     API.get(`/${id}`)
       .then(({ data }) => {

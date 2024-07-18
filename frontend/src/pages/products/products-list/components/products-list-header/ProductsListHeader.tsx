@@ -3,7 +3,7 @@ import TextField from "@mui/material/TextField";
 import { AutoComplete } from "./components";
 import { useQueryParams } from "hooks";
 
-function App() {
+const ProductsListHeader = () => {
   const [params, setQueryParams] = useQueryParams();
 
   return (
@@ -14,7 +14,6 @@ function App() {
       gap={2}
     >
       <TextField
-        id="standard-basic"
         label="Search"
         variant="standard"
         sx={{ flexGrow: 2 }}
@@ -35,6 +34,6 @@ function App() {
       />
     </Box>
   );
-}
+};
 
-export default App;
+export default ProductsListHeader;

@@ -1,2 +1,2 @@
-export { default as List } from "./list";
-export { default as Details } from "./details";
+export { default as ProductsList } from "./products-list";
+export { default as ProductDetails } from "./product-details";

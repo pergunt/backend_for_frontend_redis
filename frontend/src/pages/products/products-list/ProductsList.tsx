@@ -8,14 +8,14 @@ import {
 import { routes, API } from "configs";
 import { NavLink, Image, InfiniteScroll, PreLoader } from "components";
 import qs from "query-string";
-import { ListHeader } from "./components";
+import { ProductsListHeader } from "./components";
 import { useQueryParams } from "hooks";
 import { debounce } from "utils";
-import { ProductListItem } from "./types";
+import { ProductListItem } from "../types";
 
 const LIMIT = 25;
 
-function App() {
+const ProductsList = () => {
   const [state, setState] = useState<{
     loading: boolean;
     hasMore: boolean;
@@ -27,14 +27,26 @@ function App() {
   });
   const [params] = useQueryParams();
 
-  const loadData = (url: string) => {
-    API.get(url).then(({ data }) => {
+  const loadData = async (url: string) => {
+    setState((prevState) => ({
+      ...prevState,
+      loading: true,
+    }));
+
+    try {
+      const { data } = await API.get(`${url}`);
+
       setState({
         loading: false,
         hasMore: data.total !== data.products.length,
         items: data.products,
       });
-    });
+    } catch {
+      setState((prevState) => ({
+        ...prevState,
+        loading: false,
+      }));
+    }
   };
 
   // eslint-disable-next-line
@@ -46,24 +58,24 @@ function App() {
   );
 
   useEffect(() => {
-    const search = qs.stringify(params);
-
     if (params.category) {
       loadData(`/category/${params.category}`);
     } else {
+      const search = qs.stringify(params);
       debouncedFetch(search);
     }
   }, [params, debouncedFetch]);
 
   return (
     <Box>
-      <ListHeader />
-      <Box id="scrollableDiv" height={500} style={{ overflowY: "auto" }}>
+      <ProductsListHeader />
+      <Box id="scrollableBox" height={500} style={{ overflowY: "auto" }}>
         <InfiniteScroll
-          scrollableTarget="scrollableDiv"
+          scrollableTarget="scrollableBox"
+          style={{ overflowY: "hidden" }}
           dataLength={state.items.length + Number(state.hasMore)}
           hasMore={state.hasMore}
-          loader={<PreLoader />}
+          loader={state.loading && <PreLoader />}
           next={() => {
             loadData(`?limit=${state.items.length + LIMIT}`);
           }}
@@ -71,6 +83,7 @@ function App() {
           {state.items.map((item) => {
             return (
               <ListItemButton
+                data-testid="products-list-item"
                 key={item.id}
                 to={routes.productDetails(item.id)}
                 component={NavLink}
@@ -89,6 +102,6 @@ function App() {
       </Box>
     </Box>
   );
-}
+};
 
-export default App;
+export default ProductsList;

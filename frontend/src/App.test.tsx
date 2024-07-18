@@ -1,8 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import App from "./App";
 
-test("renders learn react link", () => {
+test("contains error box for rendering a snackbar from within axios's interceptors", () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+
+  const errorBox = screen.getByTestId("error-box");
+
+  expect(errorBox).toBeInTheDocument();
 });
