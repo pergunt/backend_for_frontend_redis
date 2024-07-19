@@ -1,10 +1,10 @@
-import { EnvKeys } from "types";
-import { ENV_VARS } from "consts";
-
 interface Result {
   error: string;
   environment: Record<EnvKeys, string>;
 }
+
+const ENV_VARS = ["API_URL", "CORS_URLS", "PORT"];
+export type EnvKeys = typeof ENV_VARS[number];
 
 export default () => {
   const { environment, error } = ENV_VARS.reduce(

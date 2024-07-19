@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   ListItemButton,
@@ -10,7 +10,6 @@ import { NavLink, Image, InfiniteScroll, PreLoader } from "components";
 import qs from "query-string";
 import { ProductsListHeader } from "./components";
 import { useQueryParams } from "hooks";
-import { debounce } from "utils";
 import { ProductListItem } from "../types";
 
 const LIMIT = 25;
@@ -34,7 +33,7 @@ const ProductsList = () => {
     }));
 
     try {
-      const { data } = await API.get(`${url}`);
+      const { data } = await API.get(`/products${url}`);
 
       setState({
         loading: false,
@@ -49,22 +48,20 @@ const ProductsList = () => {
     }
   };
 
-  // eslint-disable-next-line
-  const debouncedFetch = useCallback(
-    debounce((search: string) => {
-      loadData(`${search ? `?${search}` : ""}`);
-    }, 500),
-    []
-  );
-
   useEffect(() => {
     if (params.category) {
       loadData(`/category/${params.category}`);
     } else {
       const search = qs.stringify(params);
-      debouncedFetch(search);
+      const url = `${search ? `?${search}` : ""}`;
+
+      const timer = setTimeout(() => {
+        loadData(url);
+      }, 400);
+
+      return () => clearTimeout(timer);
     }
-  }, [params, debouncedFetch]);
+  }, [params]);
 
   return (
     <Box>

@@ -1,87 +1,68 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { BrowserRouter, Route, Routes, Navigate } from "components";
 import MockAdapter from "axios-mock-adapter";
-import ProductsList from "./ProductsList";
-import ProductDetails from "pages/products/product-details";
-import CatchAll from "pages/catch-all";
-import { API, routes } from "configs";
+import App from "App";
+import qs from "query-string";
+import { API } from "configs";
+import { mocks } from "./duck";
 
 const mock = new MockAdapter(API);
 
-const mockProducts = [
-  {
-    id: 1,
-    title: "Product 1",
-    price: 10,
-    images: ["image1.jpg"],
-    description: "description 1",
-    brand: "brand 1",
-    category: "category 1",
-  },
-  {
-    id: 2,
-    title: "Product 2",
-    price: 20,
-    images: ["image2.jpg"],
-    description: "description 1",
-    brand: "brand 1",
-    category: "category 1",
-  },
-] as const;
-
-mock.onGet(/^(?:\/category\/\w+)?$/).reply(200, {
-  total: mockProducts.length,
-  products: mockProducts,
+mock.onGet("/products").reply(200, {
+  total: mocks.products.length,
+  products: mocks.products,
 });
 
 // Mock for individual product
-mock.onGet(/\/[0-9]+/).reply((config) => {
+mock.onGet(/\/products\/[0-9]+/).reply((config) => {
   const id = config.url?.match(/\d+/)?.[0];
 
-  const product = mockProducts.find((p) => p.id === (Number(id) || null));
+  const product = mocks.products.find((p) => p.id === (Number(id) || null));
+
+  return [200, product];
+});
+
+// Mock for search
+mock.onGet(/\/products\?search=\w+$/).reply((config) => {
+  const cleared = (config.url as string).replace("/products", "");
+  const { search } = qs.parse(cleared) as { search: string };
+
+  const product = mocks.products.find((p) =>
+    p.title.toLowerCase().includes(search.toLowerCase())
+  );
 
   return [200, product];
 });
 
 describe("ProductsList", () => {
   beforeEach(() => {
-    render(
-      <BrowserRouter>
-        <Routes>
-          <Route path={routes.products} element={<ProductsList />} />
-          <Route path={routes.productDetails()} element={<ProductDetails />} />
-          <Route path="/" element={<Navigate to={routes.products} />} />
-          <Route path="*" element={<CatchAll />} />
-        </Routes>
-      </BrowserRouter>
-    );
+    render(<App />);
   });
 
   const rendersListItems = async () => {
     expect(screen.queryByTestId("products-list-item")).toBeNull();
 
     expect(await screen.findAllByTestId("products-list-item")).toHaveLength(
-      mockProducts.length
+      mocks.products.length
     );
 
-    const [product] = mockProducts;
+    const [product] = mocks.products;
 
     expect(screen.getByText(product.title)).toBeInTheDocument();
     expect(screen.getByText(`${product.price}$`)).toBeInTheDocument();
     expect(screen.getAllByAltText("Product avatar")).toHaveLength(
-      mockProducts.length
+      mocks.products.length
     );
   };
 
-  test("renders list items", async () => {
+  test("Render list", async () => {
     await rendersListItems();
   });
 
   // this could've been separated, but I didn't want to create additional files and duplicate tests
-  test("Navigates to the details page, fetches a record, renders it and goes back", async () => {
+  test("Navigate to the details page, fetch a record, render it and go back", async () => {
     const [link] = await screen.findAllByTestId("products-list-item");
-    const [product] = mockProducts;
+    const [product] = mocks.products;
 
     fireEvent.click(link);
 

@@ -37,7 +37,7 @@ const AutoComplete: FC<AutoCompleteProps> = ({ value, onChange }) => {
           }));
 
           try {
-            const { data } = await API.get(`/category-list`);
+            const { data } = await API.get(`/products/category-list`);
 
             setState((prevState) => ({
               ...prevState,

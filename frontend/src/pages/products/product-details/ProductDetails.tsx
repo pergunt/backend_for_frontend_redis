@@ -36,7 +36,7 @@ const Details = () => {
   });
 
   useEffect(() => {
-    API.get(`/${id}`)
+    API.get(`/products/${id}`)
       .then(({ data }) => {
         setState({
           record: data,
