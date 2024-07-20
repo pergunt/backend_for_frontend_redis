@@ -1,19 +1,14 @@
-/* eslint-disable */
-const fs = require("fs")
-const path = require("path")
+const path = require("path");
 
-const appDirectory = fs.realpathSync(__dirname);
-const resolveApp = (relativePath) => path.resolve(appDirectory, relativePath);
-const projectRoot = resolveApp('.');
-const tsConfig = resolveApp('tsconfig.json');
+const baseConfig = path.resolve(__dirname, '..', '.eslintrc.js')
 
 module.exports = {
   env: {
     browser: true,
-    es2021: true
+    es6: true
   },
   extends: [
-    '../.eslintrc.js',
+    baseConfig,
     'airbnb/hooks',
     'plugin:react/jsx-runtime',
   ],
@@ -66,31 +61,6 @@ module.exports = {
     'react/destructuring-assignment': 'off',
   },
   overrides: [
-    // In case if a project use both JS and TS files. Just comment out it for now
-    // {
-    //   // Extend config for js(x) files.
-    //   files: ['**/*.js?(x)'],
-    //   // Default eslint parser for JavaScript.
-    //   parser: '@babel/eslint-parser',
-    //   parserOptions: {
-    //     babelOptions: {
-    //       presets: ['@babel/preset-react'],
-    //     },
-    //   },
-    //   // Additionally, resolve imports from ts(x) files into js(x).
-    //   extends: ['plugin:import/typescript'],
-    //   rules: {
-    //     'no-restricted-exports': 0,
-    //     'default-param-last': 'off',
-    //     'no-plusplus': 'off',
-    //     camelcase: 'off',
-    //     'react/prop-types': 'off',
-    //     'react/function-component-definition': 'off',
-    //     // Disable for 'js' files in case of mixed configs as described in docs.
-    //     // https://github.com/typescript-eslint/typescript-eslint/issues/851
-    //     '@typescript-eslint/explicit-function-return-type': 'off',
-    //   },
-    // },
     {
       // Extend config for ts(x) files.
       files: ['**/*.ts?(x)'],
@@ -99,7 +69,7 @@ module.exports = {
       parser: '@typescript-eslint/parser',
       // Find project's root and project's `tsconfig.json` for parser.
       parserOptions: {
-        project: tsConfig,
+        project: './tsconfig.json',
         tsconfigRootDir: __dirname
       },
       // Extend config with typescript and typescript import in right order.

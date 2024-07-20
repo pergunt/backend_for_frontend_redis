@@ -2,7 +2,8 @@
   "name": "tech_task",
   "scripts": {
     "lint-staged": "lint-staged",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "start": "docker-compose up --build"
   },
   "lint-staged": {
     "backend/**/*.{ts,tsx}": [
@@ -18,17 +19,15 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "eslint": "8.22.0",
     "@commitlint/cli": "17.4.2",
     "@commitlint/config-conventional": "17.4.2",
     "@typescript-eslint/eslint-plugin": "5.38.0",
     "@typescript-eslint/parser": "5.38.0",
+    "eslint": "8.22.0",
     "eslint-config-airbnb": "19.0.0",
     "eslint-config-prettier": "8.3.0",
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-prettier": "4.2.1",
-    "eslint-plugin-react": "7.31.8",
-    "eslint-plugin-react-hooks": "4.6.0",
     "husky": "7.0.4",
     "lint-staged": "11.2.6",
     "prettier": "2.7.1",

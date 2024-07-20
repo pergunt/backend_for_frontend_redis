@@ -1,7 +1,10 @@
+const path = require("path");
+
+const baseConfig = path.resolve(__dirname, '..', '.eslintrc.js')
 
 module.exports = {
   extends: [
-    '../.eslintrc.js'
+    baseConfig
   ],
   settings: {
     "import/resolver": {
