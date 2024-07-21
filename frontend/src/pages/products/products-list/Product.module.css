@@ -1,0 +1,11 @@
+.listItem {
+  & .listItemText > p, span {
+    transition: transform .3s;
+  }
+
+  &:hover {
+    & .listItemText p, span {
+      transform: translateX(10px);
+    }
+  }
+}

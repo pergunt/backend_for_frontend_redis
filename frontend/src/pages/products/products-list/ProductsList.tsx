@@ -11,6 +11,7 @@ import qs from "query-string";
 import { ProductsListHeader } from "./components";
 import { useQueryParams } from "hooks";
 import { ProductListItem } from "../types";
+import styles from "./Product.module.css";
 
 const LIMIT = 25;
 
@@ -84,11 +85,13 @@ const ProductsList = () => {
                 key={item.id}
                 to={routes.productDetails(item.id)}
                 component={NavLink}
+                className={styles.listItem}
               >
                 <ListItemAvatar>
                   <Image alt="Product avatar" src={item.images[0]} />
                 </ListItemAvatar>
                 <ListItemText
+                  className={styles.listItemText}
                   primary={item.title}
                   secondary={`${item.price}$`}
                 />
