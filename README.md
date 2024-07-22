@@ -5,8 +5,10 @@
 
 ### OR
 
-1. go to "/backend" and run "npm start"
-2. go to "/frontend" and do the same
+1. run redis-server locally
+2. go to "/backend/configs/cache" and update url
+3. go to "/backend" and run "npm start"
+2. go to "/frontend" and run "npm start"
 
 ## Project structure:
 
@@ -22,4 +24,4 @@
 3. I used https://dummyjson.com. Controllers accept rotes and trigger methods of the product service
 4. I used eslint, commitlint, prettier, tslint, lint-staged, husky with these git hooks: pre-commit, post-merge, commit-msg
 5. BDD approach all tests are located close to the features they belong to
-6. I didn't implement the optional (caching) feature
+6. All images are being saved locally for better performance. Data caching logic can be found at /backend/controllers/products

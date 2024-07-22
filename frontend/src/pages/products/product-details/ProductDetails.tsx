@@ -77,7 +77,7 @@ const Details = () => {
       ) : (
         <>
           <CardHeader
-            avatar={<Image src={record.images[0]} />}
+            avatar={<Image src={record.src} />}
             title={record.title}
             subheader={record.description}
           />

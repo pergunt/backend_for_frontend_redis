@@ -2,7 +2,7 @@ export interface ProductListItem {
   id: number;
   title: string;
   price: number;
-  images: string[];
+  src: string;
 }
 
 export interface ProductDetails extends ProductListItem {

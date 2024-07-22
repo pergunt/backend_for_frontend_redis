@@ -6,6 +6,7 @@ import cors from "cors";
 import router from "router";
 import { checkEnvVars } from "utils";
 import { errorMiddleware } from "middlewares";
+import { cache } from "configs";
 
 const app = express();
 
@@ -47,6 +48,7 @@ app.use(errorMiddleware);
 
 const start = async () => {
   try {
+    await cache.connect();
     // eslint-disable-next-line
     app.listen(PORT, () => console.log(`server started on PORT=${PORT}`));
   } catch (e) {

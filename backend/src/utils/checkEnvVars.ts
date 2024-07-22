@@ -3,7 +3,8 @@ interface Result {
   environment: Record<EnvKeys, string>;
 }
 
-const ENV_VARS = ["API_URL", "CORS_URLS", "PORT"];
+const ENV_VARS = ["API_URL", "API_IMAGE_URL", "CORS_URLS", "PORT"];
+
 export type EnvKeys = typeof ENV_VARS[number];
 
 export default () => {

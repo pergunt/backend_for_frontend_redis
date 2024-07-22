@@ -1,7 +1,8 @@
 import MockAdapter from "axios-mock-adapter";
 import qs from "node:querystring";
 import { API } from "configs";
-import * as productService from "./product";
+import * as productService from "./index";
+import { constants, operations } from "./duck";
 
 const mock = new MockAdapter(API);
 
@@ -19,7 +20,7 @@ const mockProducts = [
     id: 2,
     title: "Product 2",
     price: 20,
-    images: ["image2.jpg"],
+    images: ["/image2.jpg"],
     description: "description 1",
     brand: "brand 1",
     category: "category 1",
@@ -28,23 +29,24 @@ const mockProducts = [
     id: 3,
     title: "Product 3",
     price: 20,
-    images: ["image2.jpg"],
+    images: ["/image2.jpg"],
     description: "description 3",
     brand: "brand 3",
     category: "category 1", // (!) same category
   },
-] as const;
+].map((item) => ({
+  ...item,
+  src: operations.getImageURL(item),
+}));
 const mockedCategories = mockProducts.map((item) => item.category);
 
 const filterProductsByCategory = (category: string) =>
   mockProducts.filter((item) => item.category === category);
 
-mock
-  .onGet(`/products?limit=25&select=${productService.selectedKeys}`)
-  .reply(200, {
-    total: mockProducts.length,
-    products: mockProducts,
-  });
+mock.onGet(`/products?limit=25&select=${constants.SELECTED_KEYS}`).reply(200, {
+  total: mockProducts.length,
+  products: mockProducts,
+});
 
 mock.onGet("/products/category-list").reply(200, mockedCategories);
 
@@ -61,28 +63,26 @@ mock.onGet(/\/products\/category\/\w+/).reply((config) => {
   ];
 });
 
-// Mock for individual product
-mock.onGet(/\/[0-9]+/).reply((config) => {
-  const id = config.url?.match(/\d+/)?.[0];
+mock.onGet(/\/products\/\d+\?\w/).reply((config) => {
+  const id = Number(config.url?.match(/\d+/)?.[0]);
 
-  const product = mockProducts.find((p) => p.id === (Number(id) || null));
+  const product = mockProducts.find((p) => p.id === (id || null));
 
   return [200, product];
 });
 
-mock
-  .onGet(new RegExp(`\\?q=\\w+&select=${productService.selectedKeys}`))
-  .reply((config) => {
-    const cleared = (config.url as string).replace("/products/search?", "");
+// Product search
+mock.onGet(/\/products\/search\?q=\w+/).reply((config) => {
+  const cleared = (config.url as string).replace("/products/search?", "");
 
-    const { q } = qs.decode(cleared) as { q: string };
+  const { q } = qs.decode(cleared) as { q: string };
 
-    const product = mockProducts.find((p) =>
-      p.title.toLowerCase().includes(q.toLowerCase())
-    );
+  const products = mockProducts.filter((p) =>
+    p.title.toLowerCase().includes(q.toLowerCase())
+  );
 
-    return [200, product];
-  });
+  return [200, { products }];
+});
 
 test("Return a product by ID", async () => {
   const [product] = mockProducts;
@@ -93,13 +93,17 @@ test("Return a product by ID", async () => {
 
 test("Search a product by title", async () => {
   const [product] = mockProducts;
-  const result = await productService.getList({ search: product.title });
+  const { products } = await productService.getList(
+    `/search?q=${product.title}`
+  );
 
-  expect(result).toEqual(product);
+  expect(products).toEqual(
+    mockProducts.filter((p) => p.title === product.title)
+  );
 });
 
 test("Return a list", async () => {
-  const { products } = await productService.getList({ limit: "25" });
+  const { products } = await productService.getList("?limit=25");
 
   expect(products).toHaveLength(mockProducts.length);
 });

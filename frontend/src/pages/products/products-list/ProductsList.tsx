@@ -88,7 +88,7 @@ const ProductsList = () => {
                 className={styles.listItem}
               >
                 <ListItemAvatar>
-                  <Image alt="Product avatar" src={item.images[0]} />
+                  <Image alt="Product avatar" src={item.src} />
                 </ListItemAvatar>
                 <ListItemText
                   className={styles.listItemText}
