@@ -3,11 +3,13 @@ services:
     image: "redis:latest"
     hostname: "redis"
     ports:
-      - "6380:6379"
+      - "6379:6379"
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    env_file:
+      - ./backend/.env
     ports:
       - "8080:8080"
     depends_on:
@@ -17,6 +19,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    env_file:
+      - ./frontend/.env
     ports:
       - "8000:8000"
     depends_on:

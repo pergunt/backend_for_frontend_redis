@@ -14,7 +14,7 @@
 
 1. root eslint.rc contains common rules for both frontend and backend files
 2. root package json serves the same purpose
-3. .env files are added to git on purpose so you don't have to deal with it yourself
+3. .env files are added to git on purpose so you don't have to deal with it yourself. Also if it required if you want to run the app without docker
 
 
 ## Answering the questions https://drive.google.com/file/d/1b_IrwHvWM6wV2yZwnq6tYVquwBaR5fDx/view

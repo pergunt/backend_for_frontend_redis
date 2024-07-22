@@ -70,7 +70,7 @@ const ProductsList = () => {
       <Box id="scrollableBox" height={500} style={{ overflowY: "auto" }}>
         <InfiniteScroll
           scrollableTarget="scrollableBox"
-          style={{ overflowY: "hidden" }}
+          style={{ overflow: "hidden" }}
           dataLength={state.items.length + Number(state.hasMore)}
           hasMore={state.hasMore}
           loader={state.loading && <PreLoader />}

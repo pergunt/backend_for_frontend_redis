@@ -1,8 +1,9 @@
 import { createClient } from "redis";
+import { REDIS_HOST, REDIS_PORT } from "consts";
 
 // Create a Redis client
 const client = createClient({
-  url: "redis://redis:6379",
+  url: `redis://${REDIS_HOST}:${REDIS_PORT}`,
 });
 
 client.on("connect", async () => {
