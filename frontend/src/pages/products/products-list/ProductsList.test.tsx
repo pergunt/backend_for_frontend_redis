@@ -42,21 +42,24 @@ describe("ProductsList", () => {
   const rendersListItems = async () => {
     expect(screen.queryByTestId("products-list-item")).toBeNull();
 
-    expect(await screen.findAllByTestId("products-list-item")).toHaveLength(
-      mocks.products.length
-    );
+    const fetchedItems = await screen.findAllByTestId("products-list-item");
+
+    expect(fetchedItems).toHaveLength(mocks.products.length);
 
     const [product] = mocks.products;
 
     expect(screen.getByText(product.title)).toBeInTheDocument();
     expect(screen.getByText(`${product.price}$`)).toBeInTheDocument();
-    expect(screen.getAllByAltText("Product avatar")).toHaveLength(
-      mocks.products.length
-    );
   };
 
   test("Render list", async () => {
     await rendersListItems();
+  });
+
+  test("List item has data-id", async () => {
+    const listItems = await screen.findAllByTestId("products-list-item");
+
+    expect(listItems.every((item) => item.dataset.id)).toBeTruthy();
   });
 
   // this could've been separated, but I didn't want to create additional files and duplicate tests

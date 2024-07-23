@@ -12,7 +12,7 @@ type AutoCompleteProps = Pick<
   "onChange" | "value"
 >;
 
-const AutoComplete: FC<AutoCompleteProps> = ({ value, onChange }) => {
+const AutoComplete: FC<AutoCompleteProps> = (props) => {
   const [state, setState] = useState<{
     options: string[];
     loading: boolean;
@@ -23,12 +23,11 @@ const AutoComplete: FC<AutoCompleteProps> = ({ value, onChange }) => {
 
   return (
     <Autocomplete<string, false, true, false>
+      {...props}
       data-testid="category-autocomplete"
       sx={{ flexBasis: 200 }}
       options={state.options}
       loading={state.loading}
-      value={value}
-      onChange={onChange}
       onOpen={async () => {
         if (!state.options.length) {
           setState((prevState) => ({
@@ -52,19 +51,19 @@ const AutoComplete: FC<AutoCompleteProps> = ({ value, onChange }) => {
           }
         }
       }}
-      renderInput={(props) => (
+      renderInput={(inputProps) => (
         <TextField
-          {...props}
+          {...inputProps}
           label="Category"
           variant="standard"
           InputProps={{
-            ...props.InputProps,
+            ...inputProps.InputProps,
             endAdornment: (
               <>
                 {state.loading ? (
                   <CircularProgress color="inherit" size={10} />
                 ) : null}
-                {props.InputProps.endAdornment}
+                {inputProps.InputProps.endAdornment}
               </>
             ),
           }}

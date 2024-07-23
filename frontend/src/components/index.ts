@@ -1,10 +1,4 @@
-export {
-  BrowserRouter,
-  Route,
-  Routes,
-  NavLink,
-  Navigate,
-} from "react-router-dom";
+export { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 
 export { default as InfiniteScroll } from "react-infinite-scroll-component";
 

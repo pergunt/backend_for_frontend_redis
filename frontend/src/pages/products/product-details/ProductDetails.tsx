@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useParams } from "hooks";
 import {
   Box,
   Card,
@@ -12,7 +11,8 @@ import {
   Paper,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Image, NavLink, PreLoader } from "components";
+import { useParams, useLocation, useNavigate } from "hooks";
+import { Image, PreLoader } from "components";
 import MoodBadIcon from "@mui/icons-material/MoodBad";
 import { API, routes } from "configs";
 import { ProductDetails } from "../types";
@@ -27,6 +27,8 @@ const Item = styled(Paper)(({ theme }) => ({
 
 const Details = () => {
   const { id } = useParams<"id">();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [state, setState] = useState<{
     loading: boolean;
     record: ProductDetails | null;
@@ -65,7 +67,13 @@ const Details = () => {
       }}
     >
       <CardActions>
-        <Button component={NavLink} to={routes.products}>
+        <Button
+          onClick={() => {
+            navigate(routes.products, {
+              state: location.state,
+            });
+          }}
+        >
           Go Back
         </Button>
       </CardActions>

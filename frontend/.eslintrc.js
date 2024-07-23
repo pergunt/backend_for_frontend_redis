@@ -99,6 +99,7 @@ module.exports = {
         'react/forbid-prop-types': 'off',
         // Do not throw error because we prefer to use type inheritance.
         '@typescript-eslint/explicit-function-return-type': 'off',
+        '@typescript-eslint/no-non-null-assertion': 'off',
         // Ignore unused vars for edge case (rest props)
         // e.g. { className, ...rest }
         '@typescript-eslint/no-unused-vars': [

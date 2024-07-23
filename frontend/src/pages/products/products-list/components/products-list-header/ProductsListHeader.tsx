@@ -1,10 +1,24 @@
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { AutoComplete } from "./components";
-import { useQueryParams } from "hooks";
+import { useQueryParams, useLocation } from "hooks";
+import { useEffect } from "react";
 
 const ProductsListHeader = () => {
+  const location = useLocation();
   const [params, setQueryParams] = useQueryParams();
+
+  useEffect(() => {
+    const stateFrom = location.state?.from;
+
+    if (stateFrom?.category) {
+      setQueryParams({ category: stateFrom.category });
+    } else if (stateFrom?.search) {
+      setQueryParams({ search: stateFrom.search });
+    }
+
+    delete location.state?.from;
+  }, [location.state, setQueryParams]);
 
   return (
     <Box

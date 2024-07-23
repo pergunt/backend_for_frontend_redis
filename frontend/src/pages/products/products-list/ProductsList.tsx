@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, MouseEvent } from "react";
 import {
   Box,
   ListItemButton,
@@ -6,10 +6,10 @@ import {
   ListItemAvatar,
 } from "@mui/material";
 import { routes, API } from "configs";
-import { NavLink, Image, InfiniteScroll, PreLoader } from "components";
+import { Image, InfiniteScroll, PreLoader } from "components";
 import qs from "query-string";
 import { ProductsListHeader } from "./components";
-import { useQueryParams } from "hooks";
+import { useQueryParams, useNavigate } from "hooks";
 import { ProductListItem } from "../types";
 import styles from "./Product.module.css";
 
@@ -25,6 +25,7 @@ const ProductsList = () => {
     hasMore: true,
     items: [],
   });
+  const navigate = useNavigate();
   const [params] = useQueryParams();
 
   const loadData = async (url: string) => {
@@ -64,6 +65,14 @@ const ProductsList = () => {
     }
   }, [params]);
 
+  const onItemClick = (e: MouseEvent<HTMLButtonElement>) => {
+    navigate(routes.productDetails(Number(e.currentTarget.dataset.id!)), {
+      state: {
+        from: params,
+      },
+    });
+  };
+
   return (
     <Box>
       <ProductsListHeader />
@@ -81,11 +90,12 @@ const ProductsList = () => {
           {state.items.map((item) => {
             return (
               <ListItemButton
-                data-testid="products-list-item"
                 key={item.id}
-                to={routes.productDetails(item.id)}
-                component={NavLink}
+                component="button"
+                data-id={item.id}
+                data-testid="products-list-item"
                 className={styles.listItem}
+                onClick={onItemClick}
               >
                 <ListItemAvatar>
                   <Image alt="Product avatar" src={item.src} />

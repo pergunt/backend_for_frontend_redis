@@ -1,4 +1,5 @@
 .listItem {
+  width: 100%;
   & .listItemText > p, span {
     transition: transform .3s;
   }
