@@ -7,8 +7,8 @@
 
 1. run redis-server locally
 2. go to "/backend/configs/cache" and update url
-3. go to "/backend" and run "npm start"
-2. go to "/frontend" and run "npm start"
+3. go to "/backend" and run "npm run dev"
+2. go to "/frontend" and run "npm run dev"
 
 ## Project structure:
 
