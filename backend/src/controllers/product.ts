@@ -12,6 +12,7 @@ type Fn<Params = void> = (
 
 const CACHE_KEYS = {
   PRODUCT_LIST: (url: string) => `PRODUCT_LIST/${url}`,
+  PRODUCT_SEARCH: (value: string) => `PRODUCT_LIST/${value}`,
   PRODUCT_DETAILS: (id: number) => `PRODUCT_DETAILS/${id}`,
   PRODUCT_CATEGORIES: "PRODUCT_CATEGORIES",
   PRODUCTS_BY_CATEGORY: (category: string) => `/products/category/${category}`,
@@ -30,67 +31,58 @@ const wrapper =
 
         await cache.set(cacheKey, JSON.stringify(record));
 
-        return record;
+        res.json(record);
+      } else {
+        res.json(JSON.parse(cachedRecord));
       }
-
-      res.json(JSON.parse(cachedRecord));
     } catch (e) {
       next(e);
     }
   };
 
-export const getList = wrapper((req, res) => {
-  const url = req.query.search
-    ? `/search?q=${req.query.search}`
-    : `?limit=${req.query.limit || 25}`;
+export const getList = wrapper((req) => {
+  const url = `?limit=${req.query.limit || 25}`;
 
   return {
     cacheKey: CACHE_KEYS.PRODUCT_LIST(url),
     request: async () => {
-      const products = await productService.getList(url);
-
-      res.json(products);
-
-      return products;
+      return productService.getList(url);
     },
   };
 });
 
-export const getOne = wrapper<{ id: number }>((req, res) => {
+export const search = wrapper((req) => {
+  const { q } = req.query as { q: string };
+
+  return {
+    cacheKey: CACHE_KEYS.PRODUCT_SEARCH(`/search?=${q}`),
+    request: async () => {
+      return productService.search(q);
+    },
+  };
+});
+
+export const getOne = wrapper<{ id: number }>((req) => {
   return {
     cacheKey: CACHE_KEYS.PRODUCT_DETAILS(req.params.id),
-    request: async () => {
-      const response = await productService.getByID(req.params.id);
-
-      res.json(response);
-
-      return response;
+    request: () => {
+      return productService.getByID(req.params.id);
     },
   };
 });
 
-export const getCategoryList = wrapper((req, res) => {
+export const getCategoryList = wrapper(() => {
   return {
     cacheKey: CACHE_KEYS.PRODUCT_CATEGORIES,
-    request: async () => {
-      const categoryList = await productService.getCategoryList();
-
-      res.json(categoryList);
-
-      return categoryList;
-    },
+    request: productService.getCategoryList,
   };
 });
 
-export const getByCategory = wrapper<{ category: string }>((req, res) => {
+export const getByCategory = wrapper<{ category: string }>((req) => {
   return {
     cacheKey: CACHE_KEYS.PRODUCTS_BY_CATEGORY(req.params.category),
-    request: async () => {
-      const response = await productService.getByCategory(req.params.category);
-
-      res.json(response);
-
-      return response;
+    request: () => {
+      return productService.getByCategory(req.params.category);
     },
   };
 });

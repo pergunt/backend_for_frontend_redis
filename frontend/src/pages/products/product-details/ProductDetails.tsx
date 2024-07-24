@@ -15,7 +15,7 @@ import { useParams, useLocation, useNavigate } from "hooks";
 import { Image, PreLoader } from "components";
 import MoodBadIcon from "@mui/icons-material/MoodBad";
 import { API, routes } from "configs";
-import { ProductDetails } from "../types";
+import { ProductDetails } from "types";
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#fff",

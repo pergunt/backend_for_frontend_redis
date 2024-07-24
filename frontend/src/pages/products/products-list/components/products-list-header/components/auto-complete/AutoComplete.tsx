@@ -1,5 +1,6 @@
-import { useState, FC } from "react";
-import { API } from "configs";
+import { FC } from "react";
+import { productsAPI } from "apis";
+import { useAPI } from "hooks";
 import {
   TextField,
   CircularProgress,
@@ -13,12 +14,12 @@ type AutoCompleteProps = Pick<
 >;
 
 const AutoComplete: FC<AutoCompleteProps> = (props) => {
-  const [state, setState] = useState<{
-    options: string[];
-    loading: boolean;
-  }>({
-    options: [],
-    loading: false,
+  const { loading, data, fetchData } = useAPI<string[]>({
+    request: async () => {
+      const result = await productsAPI.getCategories();
+
+      return result.data;
+    },
   });
 
   return (
@@ -26,29 +27,11 @@ const AutoComplete: FC<AutoCompleteProps> = (props) => {
       {...props}
       data-testid="category-autocomplete"
       sx={{ flexBasis: 200 }}
-      options={state.options}
-      loading={state.loading}
+      options={data || []}
+      loading={loading}
       onOpen={async () => {
-        if (!state.options.length) {
-          setState((prevState) => ({
-            ...prevState,
-            loading: true,
-          }));
-
-          try {
-            const { data } = await API.get(`/products/category-list`);
-
-            setState((prevState) => ({
-              ...prevState,
-              loading: false,
-              options: data,
-            }));
-          } catch (e) {
-            setState((prevState) => ({
-              ...prevState,
-              loading: false,
-            }));
-          }
+        if (!data?.length) {
+          fetchData();
         }
       }}
       renderInput={(inputProps) => (
@@ -60,7 +43,7 @@ const AutoComplete: FC<AutoCompleteProps> = (props) => {
             ...inputProps.InputProps,
             endAdornment: (
               <>
-                {state.loading ? (
+                {loading ? (
                   <CircularProgress color="inherit" size={10} />
                 ) : null}
                 {inputProps.InputProps.endAdornment}

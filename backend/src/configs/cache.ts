@@ -7,6 +7,7 @@ const client = createClient({
 });
 
 client.on("connect", async () => {
+  await client.flushAll();
   // eslint-disable-next-line
   console.log("Connected to Redis");
 });

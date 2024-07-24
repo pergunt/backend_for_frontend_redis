@@ -1,69 +1,81 @@
 import { useState, useEffect, MouseEvent } from "react";
-import {
-  Box,
-  ListItemButton,
-  ListItemText,
-  ListItemAvatar,
-} from "@mui/material";
-import { routes, API } from "configs";
-import { Image, InfiniteScroll, PreLoader } from "components";
-import qs from "query-string";
-import { ProductsListHeader } from "./components";
-import { useQueryParams, useNavigate } from "hooks";
-import { ProductListItem } from "../types";
-import styles from "./Product.module.css";
+import { Box } from "@mui/material";
+import { routes } from "configs";
+import { productsAPI } from "apis";
+import { InfiniteScroll } from "components";
+import * as LC from "./components";
+import { useQueryParams, useNavigate, useAPI } from "hooks";
+import { Product } from "types";
 
 const LIMIT = 25;
 
 const ProductsList = () => {
-  const [state, setState] = useState<{
-    loading: boolean;
-    hasMore: boolean;
-    items: ProductListItem[];
-  }>({
-    loading: false,
-    hasMore: true,
-    items: [],
+  const [products, setProducts] = useState<Product[]>([]);
+
+  const { loading: searching, fetchData: searchProducts } = useAPI<
+    Product[],
+    string
+  >({
+    onSuccess: setProducts,
+    request: async (value) => {
+      const { data } = await productsAPI.search(value);
+
+      return data;
+    },
   });
+  const { loading: byCategoryLoading, fetchData: fetchByCategory } = useAPI<
+    Product[],
+    string
+  >({
+    onSuccess: setProducts,
+    request: async (category) => {
+      const { data } = await productsAPI.getByCategory(category);
+
+      return data;
+    },
+  });
+
+  const {
+    loading: listLoading,
+    data: listData,
+    fetchData: fetchList,
+  } = useAPI<
+    {
+      products: Product[];
+      total: number;
+    },
+    number | void
+  >({
+    onSuccess: (result) => {
+      setProducts(result.products);
+    },
+    request: async (limit) => {
+      const { data } = await productsAPI.getList(limit);
+
+      return data;
+    },
+  });
+
+  const loading = searching || byCategoryLoading || listLoading;
+
   const navigate = useNavigate();
   const [params] = useQueryParams();
 
-  const loadData = async (url: string) => {
-    setState((prevState) => ({
-      ...prevState,
-      loading: true,
-    }));
-
-    try {
-      const { data } = await API.get(`/products${url}`);
-
-      setState({
-        loading: false,
-        hasMore: data.total !== data.products.length,
-        items: data.products,
-      });
-    } catch {
-      setState((prevState) => ({
-        ...prevState,
-        loading: false,
-      }));
-    }
-  };
-
   useEffect(() => {
-    if (params.category) {
-      loadData(`/category/${params.category}`);
-    } else {
-      const search = qs.stringify(params);
-      const url = `${search ? `?${search}` : ""}`;
-
+    if (params.search) {
       const timer = setTimeout(() => {
-        loadData(url);
+        searchProducts(params.search);
       }, 400);
 
       return () => clearTimeout(timer);
     }
-  }, [params]);
+
+    if (params.category) {
+      fetchByCategory(params.category);
+    } else {
+      fetchList();
+    }
+  }, [params, searchProducts, fetchByCategory, fetchList]);
 
   const onItemClick = (e: MouseEvent<HTMLButtonElement>) => {
     navigate(routes.productDetails(Number(e.currentTarget.dataset.id!)), {
@@ -73,41 +85,24 @@ const ProductsList = () => {
     });
   };
 
+  const hasMore = listData ? products.length < listData.total : false;
+
   return (
     <Box>
-      <ProductsListHeader />
+      <LC.ProductsListHeader />
       <Box id="scrollableBox" height={500} style={{ overflowY: "auto" }}>
         <InfiniteScroll
           scrollableTarget="scrollableBox"
-          style={{ overflow: "hidden" }}
-          dataLength={state.items.length + Number(state.hasMore)}
-          hasMore={state.hasMore}
-          loader={state.loading && <PreLoader />}
+          dataLength={products.length + Number(hasMore)}
+          hasMore={hasMore}
+          loading={loading}
           next={() => {
-            loadData(`?limit=${state.items.length + LIMIT}`);
+            fetchList(products.length + LIMIT);
           }}
         >
-          {state.items.map((item) => {
-            return (
-              <ListItemButton
-                key={item.id}
-                component="button"
-                data-id={item.id}
-                data-testid="products-list-item"
-                className={styles.listItem}
-                onClick={onItemClick}
-              >
-                <ListItemAvatar>
-                  <Image alt="Product avatar" src={item.src} />
-                </ListItemAvatar>
-                <ListItemText
-                  className={styles.listItemText}
-                  primary={item.title}
-                  secondary={`${item.price}$`}
-                />
-              </ListItemButton>
-            );
-          })}
+          {products.map((item) => (
+            <LC.ProductListItem onClick={onItemClick} key={item.id} {...item} />
+          ))}
         </InfiniteScroll>
       </Box>
     </Box>

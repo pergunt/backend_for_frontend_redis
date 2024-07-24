@@ -11,11 +11,18 @@ export const getList = async (url: string) => {
 
   return {
     ...data,
-    products: products.map((product) => ({
-      ...product,
-      src: operations.getImageURL(product),
-    })),
+    products: products.map(operations.getImageURL),
   };
+};
+
+export const search = async (value: string) => {
+  const {
+    data: { products },
+  } = await API.get<{ products: Product[] }>(
+    `/products/search?q=${value}&select=${constants.SELECTED_KEYS}`
+  );
+
+  return products.map(operations.getImageURL);
 };
 
 export const getByID = async (id: number) => {
@@ -23,10 +30,7 @@ export const getByID = async (id: number) => {
     `/products/${id}?select=${constants.SELECTED_KEYS}`
   );
 
-  return {
-    ...data,
-    src: operations.getImageURL(data),
-  };
+  return operations.getImageURL(data);
 };
 
 export const getCategoryList = async () => {
@@ -40,11 +44,5 @@ export const getByCategory = async (category: string) => {
     `/products/category/${category}`
   );
 
-  return {
-    ...data,
-    products: data.products.map((product) => ({
-      ...product,
-      src: operations.getImageURL(product),
-    })),
-  };
+  return data.products.map(operations.getImageURL);
 };
