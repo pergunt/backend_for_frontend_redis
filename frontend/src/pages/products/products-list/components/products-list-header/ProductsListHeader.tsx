@@ -1,25 +1,21 @@
+import { FC } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { AutoComplete } from "./components";
-import { useQueryParams, useLocation } from "hooks";
-import { useEffect } from "react";
 
-const ProductsListHeader = () => {
-  const location = useLocation();
-  const [params, setQueryParams] = useQueryParams();
+interface ProductsListHeader {
+  searchValue: string;
+  autoCompleteValue: string;
+  onSearch: (value: string) => void;
+  onCategory: (value: string) => void;
+}
 
-  useEffect(() => {
-    const stateFrom = location.state?.from;
-
-    if (stateFrom?.category) {
-      setQueryParams({ category: stateFrom.category });
-    } else if (stateFrom?.search) {
-      setQueryParams({ search: stateFrom.search });
-    }
-
-    delete location.state?.from;
-  }, [location.state, setQueryParams]);
-
+const ProductsListHeader: FC<ProductsListHeader> = ({
+  onSearch,
+  onCategory,
+  searchValue,
+  autoCompleteValue,
+}) => {
   return (
     <Box
       display="flex"
@@ -31,19 +27,15 @@ const ProductsListHeader = () => {
         label="Search"
         variant="standard"
         sx={{ flexGrow: 2 }}
-        value={params.search || ""}
+        value={searchValue}
         onChange={(event) => {
-          setQueryParams({
-            search: event.currentTarget.value,
-          });
+          onSearch(event.currentTarget.value);
         }}
       />
       <AutoComplete
-        value={params.category || ""}
+        value={autoCompleteValue}
         onChange={(event, value) => {
-          setQueryParams({
-            category: value,
-          });
+          onCategory(value);
         }}
       />
     </Box>

@@ -6,7 +6,12 @@ describe("ListHeader", () => {
   beforeEach(() => {
     render(
       <BrowserRouter>
-        <ProductsListHeader />
+        <ProductsListHeader
+          searchValue=""
+          autoCompleteValue=""
+          onSearch={() => {}}
+          onCategory={() => {}}
+        />
       </BrowserRouter>
     );
   });

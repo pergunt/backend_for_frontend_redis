@@ -4,12 +4,15 @@ import { routes } from "configs";
 import { productsAPI } from "apis";
 import { InfiniteScroll } from "components";
 import * as LC from "./components";
-import { useQueryParams, useNavigate, useAPI } from "hooks";
+import { useQueryParams, useNavigate, useAPI, useLocation } from "hooks";
 import { Product } from "types";
 
 const LIMIT = 25;
 
 const ProductsList = () => {
+  const navigate = useNavigate();
+  const [params, setQueryParams] = useQueryParams();
+  const location = useLocation();
   const [products, setProducts] = useState<Product[]>([]);
 
   const { loading: searching, fetchData: searchProducts } = useAPI<
@@ -58,10 +61,23 @@ const ProductsList = () => {
 
   const loading = searching || byCategoryLoading || listLoading;
 
-  const navigate = useNavigate();
-  const [params] = useQueryParams();
+  useEffect(() => {
+    const stateFrom = location.state?.from;
+
+    if (stateFrom?.category) {
+      setQueryParams({ category: stateFrom.category });
+    } else if (stateFrom?.search) {
+      setQueryParams({ search: stateFrom.search });
+    }
+
+    delete location.state?.from;
+  }, [location.state, setQueryParams]);
 
   useEffect(() => {
+    if (location.state) {
+      return;
+    }
+
     if (params.search) {
       const timer = setTimeout(() => {
         searchProducts(params.search);
@@ -75,7 +91,7 @@ const ProductsList = () => {
     } else {
       fetchList();
     }
-  }, [params, searchProducts, fetchByCategory, fetchList]);
+  }, [params, location.state, searchProducts, fetchByCategory, fetchList]);
 
   const onItemClick = (e: MouseEvent<HTMLButtonElement>) => {
     navigate(routes.productDetails(Number(e.currentTarget.dataset.id!)), {
@@ -89,7 +105,16 @@ const ProductsList = () => {
 
   return (
     <Box>
-      <LC.ProductsListHeader />
+      <LC.ProductsListHeader
+        searchValue={params.search || ""}
+        autoCompleteValue={params.category || ""}
+        onSearch={(search) => {
+          setQueryParams({ search });
+        }}
+        onCategory={(category) => {
+          setQueryParams({ category });
+        }}
+      />
       <Box id="scrollableBox" height={500} style={{ overflowY: "auto" }}>
         <InfiniteScroll
           scrollableTarget="scrollableBox"
