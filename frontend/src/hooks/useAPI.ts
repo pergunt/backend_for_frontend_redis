@@ -32,7 +32,7 @@ const useAPI = <Data, Arg = void>({
         loading: false,
         data,
       });
-    } catch {
+    } catch (e) {
       setState((prevState) => ({
         ...prevState,
         loading: false,

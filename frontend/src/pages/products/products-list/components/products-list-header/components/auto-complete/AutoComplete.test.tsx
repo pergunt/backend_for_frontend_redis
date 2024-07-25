@@ -1,18 +1,12 @@
-import MockAdapter from "axios-mock-adapter";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { API } from "configs";
 import AutoComplete from "./AutoComplete";
 import { mocks } from "../../../../duck";
 
-const mock = new MockAdapter(API);
-
-mock.onGet("/products/category-list").reply(() => {
-  return [200, mocks.productCategories];
-});
-
 test("Fetch product categories", async () => {
-  render(<AutoComplete />);
+  const { getCategories } = mocks.getMockedAPI();
+
+  render(<AutoComplete getCategories={getCategories} />);
 
   const autocomplete = screen
     .getByTestId("category-autocomplete")

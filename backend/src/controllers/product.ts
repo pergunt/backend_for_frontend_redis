@@ -1,4 +1,5 @@
-import { productService } from "services";
+import { ProductsService } from "services";
+import { productsAPI } from "apis";
 import { NextFunction, Request, Response } from "express";
 import { cache } from "configs";
 
@@ -11,12 +12,14 @@ type Fn<Params = void> = (
 };
 
 const CACHE_KEYS = {
-  PRODUCT_LIST: (url: string) => `PRODUCT_LIST/${url}`,
+  PRODUCT_LIST: (limit: string | number) => `PRODUCT_LIST/${limit}`,
   PRODUCT_SEARCH: (value: string) => `PRODUCT_LIST/${value}`,
   PRODUCT_DETAILS: (id: number) => `PRODUCT_DETAILS/${id}`,
   PRODUCT_CATEGORIES: "PRODUCT_CATEGORIES",
   PRODUCTS_BY_CATEGORY: (category: string) => `/products/category/${category}`,
 } as const;
+
+const productsService = new ProductsService(productsAPI);
 
 const wrapper =
   <Params = void>(fn: Fn<Params>) =>
@@ -41,12 +44,12 @@ const wrapper =
   };
 
 export const getList = wrapper((req) => {
-  const url = `?limit=${req.query.limit || 25}`;
+  const limit = Number(req.query.limit) || 25;
 
   return {
-    cacheKey: CACHE_KEYS.PRODUCT_LIST(url),
+    cacheKey: CACHE_KEYS.PRODUCT_LIST(limit),
     request: async () => {
-      return productService.getList(url);
+      return productsService.getList(limit);
     },
   };
 });
@@ -57,7 +60,7 @@ export const search = wrapper((req) => {
   return {
     cacheKey: CACHE_KEYS.PRODUCT_SEARCH(`/search?=${q}`),
     request: async () => {
-      return productService.search(q);
+      return productsService.search(q);
     },
   };
 });
@@ -66,7 +69,7 @@ export const getOne = wrapper<{ id: number }>((req) => {
   return {
     cacheKey: CACHE_KEYS.PRODUCT_DETAILS(req.params.id),
     request: () => {
-      return productService.getByID(req.params.id);
+      return productsService.getByID(req.params.id);
     },
   };
 });
@@ -74,7 +77,7 @@ export const getOne = wrapper<{ id: number }>((req) => {
 export const getCategoryList = wrapper(() => {
   return {
     cacheKey: CACHE_KEYS.PRODUCT_CATEGORIES,
-    request: productService.getCategoryList,
+    request: () => productsService.getCategoryList(),
   };
 });
 
@@ -82,7 +85,7 @@ export const getByCategory = wrapper<{ category: string }>((req) => {
   return {
     cacheKey: CACHE_KEYS.PRODUCTS_BY_CATEGORY(req.params.category),
     request: () => {
-      return productService.getByCategory(req.params.category);
+      return productsService.getByCategory(req.params.category);
     },
   };
 });

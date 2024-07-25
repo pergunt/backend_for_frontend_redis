@@ -1,5 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "components";
+import { productsAPI } from "apis";
 import ProductsListHeader from "./ProductsListHeader";
 
 describe("ListHeader", () => {
@@ -7,6 +8,7 @@ describe("ListHeader", () => {
     render(
       <BrowserRouter>
         <ProductsListHeader
+          getCategories={productsAPI.getCategories}
           searchValue=""
           autoCompleteValue=""
           onSearch={() => {}}

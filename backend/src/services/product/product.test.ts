@@ -1,122 +1,49 @@
-import MockAdapter from "axios-mock-adapter";
-import qs from "node:querystring";
-import { API } from "configs";
-import * as productService from "./index";
-import { constants, operations } from "./duck";
-
-const mock = new MockAdapter(API);
-
-const mockProducts = [
-  {
-    id: 1,
-    title: "Product1",
-    price: 10,
-    images: ["image1.jpg"],
-    description: "description 1",
-    brand: "brand 1",
-    category: "category 1",
-  },
-  {
-    id: 2,
-    title: "Product 2",
-    price: 20,
-    images: ["/image2.jpg"],
-    description: "description 1",
-    brand: "brand 1",
-    category: "category 1",
-  },
-  {
-    id: 3,
-    title: "Product 3",
-    price: 20,
-    images: ["/image2.jpg"],
-    description: "description 3",
-    brand: "brand 3",
-    category: "category 1", // (!) same category
-  },
-].map((item) => ({
-  ...item,
-  src: operations.getImageURL(item),
-}));
-const mockedCategories = mockProducts.map((item) => item.category);
+import ProductsService from "./index";
+import { mocks } from "./duck";
 
 const filterProductsByCategory = (category: string) =>
-  mockProducts.filter((item) => item.category === category);
+  mocks.mockProducts.filter((item) => item.category === category);
 
-mock.onGet(`/products?limit=25&select=${constants.SELECTED_KEYS}`).reply(200, {
-  total: mockProducts.length,
-  products: mockProducts,
-});
+describe("Product API", () => {
+  const { mockProducts } = mocks;
+  let productsService: ProductsService;
 
-mock.onGet("/products/category-list").reply(200, mockedCategories);
+  beforeEach(() => {
+    productsService = new ProductsService(mocks.getMockedAPI());
+  });
 
-mock.onGet(/\/products\/category\/\w+/).reply((config) => {
-  const category = (config.url as string).replace("/products/category/", "");
-  const products = filterProductsByCategory(category);
+  test("Return a product by ID", async () => {
+    const [product] = mockProducts;
+    const result = await productsService.getByID(product.id);
 
-  return [
-    200,
-    {
-      total: products.length,
-      products,
-    },
-  ];
-});
+    expect(result).toEqual(product);
+  });
 
-mock.onGet(/\/products\/\d+\?\w/).reply((config) => {
-  const id = Number(config.url?.match(/\d+/)?.[0]);
+  test("Search a product by title", async () => {
+    const [product] = mockProducts;
+    const products = await productsService.search(product.title);
 
-  const product = mockProducts.find((p) => p.id === (id || null));
+    expect(products).toEqual(
+      mockProducts.filter((p) => p.title === product.title)
+    );
+  });
 
-  return [200, product];
-});
+  test("Return a list", async () => {
+    const { products } = await productsService.getList(25);
 
-// Product search
-mock.onGet(/\/products\/search\?q=\w+/).reply((config) => {
-  const cleared = (config.url as string).replace("/products/search?", "");
+    expect(products).toHaveLength(mockProducts.length);
+  });
 
-  const { q } = qs.decode(cleared) as { q: string };
+  test("Search products by categories", async () => {
+    const [product] = mockProducts;
+    const products = await productsService.getByCategory(product.category);
 
-  const products = mockProducts.filter((p) =>
-    p.title.toLowerCase().includes(q.toLowerCase())
-  );
+    expect(products).toEqual(filterProductsByCategory(product.category));
+  });
 
-  return [200, { products }];
-});
+  test("Return categories list", async () => {
+    const categories = await productsService.getCategoryList();
 
-test("Return a product by ID", async () => {
-  const [product] = mockProducts;
-  const result = await productService.getByID(product.id);
-
-  expect(result).toEqual(product);
-});
-
-test("Search a product by title", async () => {
-  const [product] = mockProducts;
-  const { products } = await productService.getList(
-    `/search?q=${product.title}`
-  );
-
-  expect(products).toEqual(
-    mockProducts.filter((p) => p.title === product.title)
-  );
-});
-
-test("Return a list", async () => {
-  const { products } = await productService.getList("?limit=25");
-
-  expect(products).toHaveLength(mockProducts.length);
-});
-
-test("Search products by categories", async () => {
-  const [product] = mockProducts;
-  const { products } = await productService.getByCategory(product.category);
-
-  expect(products).toEqual(filterProductsByCategory(product.category));
-});
-
-test("Return categories list", async () => {
-  const categories = await productService.getCategoryList();
-
-  expect(categories).toEqual(mockedCategories);
+    expect(categories).toEqual(mocks.mockedCategories);
+  });
 });

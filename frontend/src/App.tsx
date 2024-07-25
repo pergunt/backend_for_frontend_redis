@@ -3,6 +3,7 @@ import ScopedCssBaseline from "@mui/material/ScopedCssBaseline";
 import Box from "@mui/material/Box";
 import { Products, CatchAll } from "pages";
 import { routes } from "configs";
+import { productsAPI } from "apis";
 import { Routes, Route, Navigate, BrowserRouter } from "components";
 
 const App = () => {
@@ -15,11 +16,15 @@ const App = () => {
             <Routes>
               <Route
                 path={routes.products}
-                element={<Products.ProductsList />}
+                element={<Products.ProductsList api={productsAPI} />}
               />
               <Route
                 path={routes.productDetails()}
-                element={<Products.ProductDetails />}
+                element={
+                  <Products.ProductDetails
+                    getOne={productsAPI.getOne.bind(productsAPI)}
+                  />
+                }
               />
               <Route path="/" element={<Navigate to={routes.products} />} />
               <Route path="*" element={<CatchAll />} />

@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { productsAPI } from "apis";
+import { ProductsAPI } from "apis";
 import { useAPI } from "hooks";
 import {
   TextField,
@@ -11,12 +11,13 @@ import {
 type AutoCompleteProps = Pick<
   AutocompleteProps<string, false, true, false>,
   "onChange" | "value"
->;
+> &
+  Pick<ProductsAPI, "getCategories">;
 
-const AutoComplete: FC<AutoCompleteProps> = (props) => {
+const AutoComplete: FC<AutoCompleteProps> = ({ getCategories, ...props }) => {
   const { loading, data, fetchData } = useAPI<string[]>({
     request: async () => {
-      const result = await productsAPI.getCategories();
+      const result = await getCategories();
 
       return result.data;
     },

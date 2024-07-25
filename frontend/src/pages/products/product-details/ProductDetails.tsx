@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { FC, useEffect } from "react";
 import {
   Box,
   Card,
@@ -11,10 +11,11 @@ import {
   Paper,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { useParams, useLocation, useNavigate } from "hooks";
+import { useParams, useLocation, useNavigate, useAPI } from "hooks";
 import { Image, PreLoader } from "components";
 import MoodBadIcon from "@mui/icons-material/MoodBad";
-import { API, routes } from "configs";
+import { routes } from "configs";
+import { ProductsAPI } from "apis";
 import { ProductDetails } from "types";
 
 const Item = styled(Paper)(({ theme }) => ({
@@ -25,39 +26,21 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
-const Details = () => {
+const Details: FC<Pick<ProductsAPI, "getOne">> = ({ getOne }) => {
   const { id } = useParams<"id">();
   const location = useLocation();
   const navigate = useNavigate();
-  const [state, setState] = useState<{
-    loading: boolean;
-    record: ProductDetails | null;
-  }>({
-    loading: true,
-    record: null,
+  const { data, loading, fetchData } = useAPI<ProductDetails, number | string>({
+    request: (itemID) => getOne(itemID).then((r) => r.data),
   });
 
   useEffect(() => {
-    API.get(`/products/${id}`)
-      .then(({ data }) => {
-        setState({
-          record: data,
-          loading: false,
-        });
-      })
-      .catch(() => {
-        setState({
-          record: null,
-          loading: false,
-        });
-      });
-  }, [id]);
+    fetchData(id!);
+  }, [id, fetchData]);
 
-  if (state.loading) {
+  if (loading) {
     return <PreLoader />;
   }
-
-  const { record } = state;
 
   return (
     <Card
@@ -77,7 +60,7 @@ const Details = () => {
           Go Back
         </Button>
       </CardActions>
-      {!record ? (
+      {!data ? (
         <Box textAlign="center">
           <MoodBadIcon />
           <Typography>Not Found</Typography>
@@ -85,15 +68,15 @@ const Details = () => {
       ) : (
         <>
           <CardHeader
-            avatar={<Image src={record.src} />}
-            title={record.title}
-            subheader={record.description}
+            avatar={<Image src={data.src} />}
+            title={data.title}
+            subheader={data.description}
           />
           <CardContent>
             <Stack direction="row" spacing={2} justifyContent="space-around">
-              <Item>{record.brand}</Item>
-              <Item>{record.category}</Item>
-              <Item>{record.price}$</Item>
+              <Item>{data.brand}</Item>
+              <Item>{data.category}</Item>
+              <Item>{data.price}$</Item>
             </Stack>
           </CardContent>
         </>

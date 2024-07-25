@@ -24,6 +24,7 @@ module.exports = {
     },
   },
   rules: {
+    'react/jsx-no-bind': 0,
     'react/function-component-definition': 0,
     'react/no-unstable-nested-components': 0,
     // This rule was deprecated in v6.1.0. It will no longer be maintained.

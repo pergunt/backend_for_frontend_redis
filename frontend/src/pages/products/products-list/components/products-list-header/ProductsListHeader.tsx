@@ -2,8 +2,9 @@ import { FC } from "react";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { AutoComplete } from "./components";
+import { ProductsAPI } from "apis";
 
-interface ProductsListHeader {
+interface ProductsListHeader extends Pick<ProductsAPI, "getCategories"> {
   searchValue: string;
   autoCompleteValue: string;
   onSearch: (value: string) => void;
@@ -15,6 +16,7 @@ const ProductsListHeader: FC<ProductsListHeader> = ({
   onCategory,
   searchValue,
   autoCompleteValue,
+  getCategories,
 }) => {
   return (
     <Box
@@ -33,6 +35,7 @@ const ProductsListHeader: FC<ProductsListHeader> = ({
         }}
       />
       <AutoComplete
+        getCategories={getCategories}
         value={autoCompleteValue}
         onChange={(event, value) => {
           onCategory(value);

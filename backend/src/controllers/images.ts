@@ -1,6 +1,9 @@
 import { NextFunction, Request, Response } from "express";
-import { filesService } from "services";
+import { ImagesService } from "services";
+import { imagesAPI } from "apis";
 import { ProductImage } from "types";
+
+const imagesService = new ImagesService(imagesAPI);
 
 export const getOne = async (
   req: Request<ProductImage>,
@@ -9,7 +12,8 @@ export const getOne = async (
 ) => {
   try {
     const { params } = req;
-    await filesService.getFile(params, res);
+
+    await imagesService.getOne(params, res);
   } catch (e) {
     next(e);
   }

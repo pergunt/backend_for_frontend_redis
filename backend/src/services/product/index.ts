@@ -1,48 +1,56 @@
-import { API } from "configs";
-import { Product } from "types";
+import { ProductsAPI } from "apis";
 import { operations, constants } from "./duck";
 
-export const getList = async (url: string) => {
-  const {
-    data: { products, ...data },
-  } = await API.get<{ products: Product[] }>(
-    `/products${url}&select=${constants.SELECTED_KEYS}`
-  );
+export default class ProductsService {
+  api: ProductsAPI;
 
-  return {
-    ...data,
-    products: products.map(operations.getImageURL),
-  };
-};
+  constructor(api: ProductsAPI) {
+    this.api = api;
+  }
 
-export const search = async (value: string) => {
-  const {
-    data: { products },
-  } = await API.get<{ products: Product[] }>(
-    `/products/search?q=${value}&select=${constants.SELECTED_KEYS}`
-  );
+  async getList(limit: number) {
+    const {
+      data: { products, ...data },
+    } = await this.api.getList({
+      limit,
+      select: constants.SELECTED_KEYS,
+    });
 
-  return products.map(operations.getImageURL);
-};
+    return {
+      ...data,
+      products: products.map(operations.getImageURL),
+    };
+  }
 
-export const getByID = async (id: number) => {
-  const { data } = await API.get<Product>(
-    `/products/${id}?select=${constants.SELECTED_KEYS}`
-  );
+  async search(value: string) {
+    const {
+      data: { products },
+    } = await this.api.search({
+      value,
+      select: constants.SELECTED_KEYS,
+    });
 
-  return operations.getImageURL(data);
-};
+    return products.map(operations.getImageURL);
+  }
 
-export const getCategoryList = async () => {
-  const { data } = await API.get("/products/category-list");
+  async getByID(id: number) {
+    const { data } = await this.api.getOne({
+      id,
+      select: constants.SELECTED_KEYS,
+    });
 
-  return data;
-};
+    return operations.getImageURL(data);
+  }
 
-export const getByCategory = async (category: string) => {
-  const { data } = await API.get<{ products: Product[] }>(
-    `/products/category/${category}`
-  );
+  async getCategoryList() {
+    const { data } = await this.api.getCategories();
 
-  return data.products.map(operations.getImageURL);
-};
+    return data;
+  }
+
+  async getByCategory(category: string) {
+    const { data } = await this.api.getByCategory(category);
+
+    return data.products.map(operations.getImageURL);
+  }
+}
