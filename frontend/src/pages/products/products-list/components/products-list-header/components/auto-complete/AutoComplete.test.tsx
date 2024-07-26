@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import AutoComplete from "./AutoComplete";
-import { mocks } from "../../../../duck";
+import { products } from "mocks";
 
 test("Fetch product categories", async () => {
-  const { getCategories } = mocks.getMockedAPI();
+  const { getCategories } = products.getMockedAPI();
 
   render(<AutoComplete getCategories={getCategories} />);
 
@@ -17,5 +17,5 @@ test("Fetch product categories", async () => {
   const liItems = await screen.findAllByRole("option");
   const values = liItems.map((li) => li.textContent);
 
-  expect(values).toEqual(mocks.productCategories);
+  expect(values).toEqual(products.categories);
 });

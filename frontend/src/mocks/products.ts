@@ -1,4 +1,7 @@
-export const products = [
+import { AxiosResponse } from "axios";
+import { ProductDetails } from "types";
+
+export const data = [
   {
     id: 1,
     title: "Product1",
@@ -21,24 +24,33 @@ export const products = [
   },
 ] as const;
 
-export const productCategories = products.map((item) => item.category);
+export const categories = data.map((item) => item.category);
 
 export const getMockedAPI = () => ({
   baseURL: "/products",
+  getOne: jest.fn(() => {
+    return new Promise<AxiosResponse<ProductDetails>>((resolve) => {
+      setTimeout(() => {
+        resolve({
+          data: data[0],
+        } as AxiosResponse);
+      }, 1000);
+    });
+  }),
   search: jest.fn().mockResolvedValue({
-    data: products,
+    data,
   }),
   getCategories: jest.fn().mockResolvedValue({
-    data: productCategories,
+    data: categories,
   }),
   getByCategory: jest.fn().mockResolvedValue({
-    data: products,
+    data,
   }),
   getList: jest.fn().mockResolvedValue({
     data: {
-      total: products.length,
+      total: data.length,
       skip: 0,
-      products,
+      products: data,
     },
   }),
 });

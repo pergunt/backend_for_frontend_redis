@@ -31,7 +31,11 @@ const Details: FC<Pick<ProductsAPI, "getOne">> = ({ getOne }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { data, loading, fetchData } = useAPI<ProductDetails, number | string>({
-    request: (itemID) => getOne(itemID).then((r) => r.data),
+    request: async (itemID) => {
+      const result = await getOne(itemID);
+
+      return result.data;
+    },
   });
 
   useEffect(() => {

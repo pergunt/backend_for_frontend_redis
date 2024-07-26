@@ -1,7 +1,7 @@
 import { render, act, RenderResult } from "@testing-library/react";
 import { BrowserRouter } from "components";
 import ProductsList from "./ProductsList";
-import { mocks } from "./duck";
+import { products } from "mocks";
 
 describe("ProductsList", () => {
   let renderResult: RenderResult;
@@ -10,7 +10,7 @@ describe("ProductsList", () => {
     await act(async () => {
       renderResult = render(
         <BrowserRouter>
-          <ProductsList api={mocks.getMockedAPI()} />
+          <ProductsList api={products.getMockedAPI()} />
         </BrowserRouter>
       );
     });
@@ -21,6 +21,6 @@ describe("ProductsList", () => {
       "products-list-item"
     );
 
-    expect(fetchedItems).toHaveLength(mocks.products.length);
+    expect(fetchedItems).toHaveLength(products.data.length);
   });
 });

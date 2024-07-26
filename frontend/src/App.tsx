@@ -22,7 +22,7 @@ const App = () => {
                 path={routes.productDetails()}
                 element={
                   <Products.ProductDetails
-                    getOne={productsAPI.getOne.bind(productsAPI)}
+                    getOne={(id) => productsAPI.getOne(id)}
                   />
                 }
               />

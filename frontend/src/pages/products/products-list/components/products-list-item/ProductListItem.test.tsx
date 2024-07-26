@@ -1,18 +1,18 @@
 import { render, RenderResult } from "@testing-library/react";
 import ProductListItem from "./ProductListItem";
-import { mocks } from "../../duck";
+import { products } from "mocks";
 
 describe("ProductsList", () => {
   let renderResult: RenderResult;
 
   beforeEach(async () => {
-    const [product] = mocks.products;
+    const [product] = products.data;
 
     renderResult = render(<ProductListItem {...product} onClick={() => {}} />);
   });
 
   test("Render a product list item", async () => {
-    const [product] = mocks.products;
+    const [product] = products.data;
 
     const avatar = renderResult.getByAltText("Product avatar");
     const title = renderResult.getByText(product.title);

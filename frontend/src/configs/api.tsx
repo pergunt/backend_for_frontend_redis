@@ -1,6 +1,6 @@
-import ReactDOM from "react-dom/client";
 import axios from "axios";
 import { ErrorSnackbar } from "components";
+import { showError } from "utils";
 
 const API = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
@@ -9,11 +9,10 @@ const API = axios.create({
 API.interceptors.response.use(
   (config) => config,
   (error) => {
-    const root = ReactDOM.createRoot(
-      document.getElementById("error-box") as HTMLElement
-    );
-
-    root.render(<ErrorSnackbar />);
+    showError({
+      component: <ErrorSnackbar />,
+      elID: "error-box",
+    });
 
     throw error;
   }

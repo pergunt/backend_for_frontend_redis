@@ -75,7 +75,7 @@ const ProductsList: FC<{ api: Omit<ProductsAPI, "getOne"> }> = ({ api }) => {
           setQueryParams({ category });
         }}
       />
-      <Box id="scrollableBox" height={500} style={{ overflowY: "auto" }}>
+      <Box id="scrollableBox" height={500} sx={{ overflowY: "auto" }}>
         <InfiniteScroll
           scrollableTarget="scrollableBox"
           dataLength={products.length}
